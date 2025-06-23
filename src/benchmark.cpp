@@ -517,6 +517,8 @@ void benchmark_t::run() noexcept
                     elapsed = sw.elapsed<std::chrono::milliseconds>();
                     finished = true;
                 }
+
+                tree_->thread_finish(tid);
             }
         }
     }
