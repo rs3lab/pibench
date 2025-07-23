@@ -139,6 +139,10 @@ public:
 
     virtual void thread_finish(int thread_id) {};
 
+    virtual void benchmark_start() {};
+
+    virtual void benchmark_finish() {};
+
     virtual void set_combining_batch(unsigned int batch_size) {};
 
 };

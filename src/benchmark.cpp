@@ -363,6 +363,8 @@ void benchmark_t::run() noexcept
         *before_sstate = getSystemCounterState();
     }
 
+    tree_->benchmark_start();
+
     double elapsed = 0.0;
     stopwatch_t sw;
     omp_set_nested(true);
@@ -523,6 +525,8 @@ void benchmark_t::run() noexcept
         }
     }
     omp_set_nested(false);
+
+    tree_->benchmark_finish();
 
     if (opt_.enable_perf)
     {
