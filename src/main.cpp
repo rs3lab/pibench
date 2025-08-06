@@ -369,6 +369,8 @@ int main(int argc, char** argv)
 #endif
     bench.load();
     bench.run();
+    tree->analyze_lock_contention();
+    bench.run();
 
     delete tree;
     return 0;

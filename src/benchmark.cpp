@@ -272,12 +272,14 @@ void benchmark_t::load() noexcept
         }
     }
 
-    tree_->tls_reset();
-    std::cout << "Load verified; benchmark started." << std::endl;
+    std::cout << "Load verified" << std::endl;
 }
 
 void benchmark_t::run() noexcept
 {
+    tree_->tls_reset();
+    std::cout << "Benchmark started." << std::endl;
+
     std::vector<stats_t> global_stats;
     global_stats.resize(100000); // Avoid overhead of allocation and page fault
     global_stats.resize(0);

@@ -145,6 +145,8 @@ public:
 
     virtual void set_combining_batch(unsigned int batch_size) {};
 
+    virtual void analyze_lock_contention() {};
+
 };
 
 #endif
