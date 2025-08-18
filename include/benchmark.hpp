@@ -138,6 +138,10 @@ struct options_t
 
     /// OpTCL batch_size (could be extended for tclrw)
     uint32_t batch_size = 0;
+
+    /// For TDLOCK
+    uint32_t num_delegation_threads = 0;
+    uint32_t num_threads_per_socket = 0;
 };
 
 /**

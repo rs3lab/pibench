@@ -63,6 +63,8 @@ int main(int argc, char** argv)
             ("enable_perf", "Enable perf", cxxopts::value<bool>()->default_value((opt.enable_perf ? "true" : "false")))
             ("perf_record_args", "Arguments to perf-record", cxxopts::value<std::string>()->default_value(""))
             ("batch_size", "Combining size for OpTCL", cxxopts::value<uint32_t>()->default_value(std::to_string(0)))
+            ("num_delegation_threads", "Total number of delegation threads", cxxopts::value<uint32_t>()->default_value(std::to_string(opt.num_delegation_threads)))
+            ("num_threads_per_socket", "Number of threads per socket", cxxopts::value<uint32_t>()->default_value(std::to_string(opt.num_threads_per_socket)))
             ("help", "Print help")
         ;
 
@@ -72,6 +74,16 @@ int main(int argc, char** argv)
         if (result.count("batch_size"))
         {
             opt.batch_size = result["batch_size"].as<uint32_t>();            
+        }
+
+        if(result.count("num_delegation_threads"))
+        {
+            opt.num_delegation_threads = result["num_delegation_threads"].as<uint32_t>();
+        }
+
+        if(result.count("num_threads_per_socket"))
+        {
+            opt.num_threads_per_socket = result["num_threads_per_socket"].as<uint32_t>();
         }
 
         if (result.count("help"))
@@ -361,6 +373,7 @@ int main(int argc, char** argv)
         exit(1);
     }
     tree->set_combining_batch(opt.batch_size);
+    tree->set_num_threads_per_socket(opt.num_threads_per_socket);
 
 #if defined(EPOCH_BASED_RECLAMATION)
     bench.setTree(tree);
@@ -369,8 +382,8 @@ int main(int argc, char** argv)
 #endif
     bench.load();
     bench.run();
-    tree->analyze_lock_contention();
-    bench.run();
+    //tree->analyze_lock_contention();
+    //bench.run();
 
     delete tree;
     return 0;

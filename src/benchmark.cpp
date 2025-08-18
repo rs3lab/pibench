@@ -302,7 +302,7 @@ void benchmark_t::run() noexcept
     }
 
     // Control variable of monitor thread
-    bool finished = false;
+    int finished = false;
 
     // The amount of inserts expected to be done by each thread + some play room.
     uint64_t inserts_per_thread = 10 + (opt_.num_ops * opt_.insert_ratio) / opt_.num_threads;
@@ -370,7 +370,11 @@ void benchmark_t::run() noexcept
     double elapsed = 0.0;
     stopwatch_t sw;
     omp_set_nested(true);
-    #pragma omp parallel sections num_threads(2)
+
+    std::atomic<int> delegation_thread_id{0};
+    std::atomic<int> worker_thread_id{0};
+
+    #pragma omp parallel sections num_threads(3)
     {
         #pragma omp section // Monitor thread
         {
@@ -405,11 +409,27 @@ void benchmark_t::run() noexcept
             }
         }
 
+        #pragma omp section // Delegation thread
+        {
+            #pragma omp parallel num_threads(opt_.num_delegation_threads)
+            {
+                auto tid = (delegation_thread_id.fetch_add(1) * opt_.num_threads_per_socket);
+                set_affinity(tid);
+                tree_->tls_setup();
+                tree_->thread_start(tid);
+                tree_->run_delegation_thread(&finished);
+                tree_->thread_finish(tid);
+            }
+        }
+
         #pragma omp section // Worker threads
         {
-            #pragma omp parallel num_threads(opt_.num_threads)
+            #pragma omp parallel num_threads((opt_.num_threads - opt_.num_delegation_threads))
             {
-                auto tid = omp_get_thread_num();
+                auto tid = worker_thread_id.fetch_add(1);
+                if(opt_.num_delegation_threads > 0) {
+                    tid += (tid / (opt_.num_threads_per_socket - 1)) + 1;
+                }
                 set_affinity(tid);
 
                 tree_->tls_setup();
@@ -527,6 +547,8 @@ void benchmark_t::run() noexcept
         }
     }
     omp_set_nested(false);
+
+    finished = 2; //For delegation (OpTDL)
 
     tree_->benchmark_finish();
 

@@ -147,6 +147,9 @@ public:
 
     virtual void analyze_lock_contention() {};
 
+    virtual void run_delegation_thread(int* finished) {};
+
+    virtual void set_num_threads_per_socket(uint32_t num_threads_per_socket) {};
 };
 
 #endif
