@@ -19,10 +19,10 @@ extern std::vector<CPUCore> cpu_cores;
 bool DetectCPUCores();
 
 static void set_affinity(uint32_t thread_id) {
-  int my_cpu_id = cpu_cores[thread_id % cpu_cores.size()][thread_id / cpu_cores.size()];
-  cpu_set_t my_set;
-  CPU_ZERO(&my_set);
-  CPU_SET(my_cpu_id, &my_set);
-  sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
+//  int my_cpu_id = cpu_cores[thread_id % cpu_cores.size()][thread_id / cpu_cores.size()];
+//  cpu_set_t my_set;
+//  CPU_ZERO(&my_set);
+//  CPU_SET(my_cpu_id, &my_set);
+//  sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
   //std::cout << "Pinned thread " << thread_id << " to CPU " << my_cpu_id << std::endl;
 }

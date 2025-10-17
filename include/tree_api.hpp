@@ -16,6 +16,7 @@
 #define __TREE_API_HPP__
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 struct tree_options_t
