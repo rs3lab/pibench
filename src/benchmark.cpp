@@ -374,7 +374,7 @@ void benchmark_t::run() noexcept
     std::atomic<int> delegation_thread_id{0};
     std::atomic<int> worker_thread_id{0};
 
-    #pragma omp parallel sections num_threads(3)
+    #pragma omp parallel sections num_threads(2)
     {
         #pragma omp section // Monitor thread
         {
@@ -409,7 +409,7 @@ void benchmark_t::run() noexcept
             }
         }
 
-        #pragma omp section // Delegation thread
+        /*#pragma omp section // Delegation thread
         {
             #pragma omp parallel num_threads(opt_.num_delegation_threads)
             {
@@ -420,20 +420,25 @@ void benchmark_t::run() noexcept
                 tree_->run_delegation_thread(&finished);
                 tree_->thread_finish(tid);
             }
-        }
+        }*/
 
         #pragma omp section // Worker threads
         {
             #pragma omp parallel num_threads((opt_.num_threads - opt_.num_delegation_threads))
             {
-                auto tid = worker_thread_id.fetch_add(1);
-                if(opt_.num_delegation_threads > 0) {
+                //auto tid = worker_thread_id.fetch_add(1);
+		auto tid = omp_get_thread_num();
+                /*if(opt_.num_delegation_threads > 0) {
                     tid += (tid / (opt_.num_threads_per_socket - 1)) + 1;
-                }
+                }*/
                 set_affinity(tid);
+
+		//printf("omp1 threadnum: %d tid: %d cpuid: %d\n", omp_get_thread_num(), tid, sched_getcpu());
 
                 tree_->tls_setup();
                 tree_->thread_start(tid);
+
+		//printf("omp2 threadnum: %d tid: %d cpuid: %d\n", omp_get_thread_num(), tid, sched_getcpu());
 
                 // Initialize random seed for each thread
                 key_generator_->set_seed(opt_.rnd_seed * (tid + 1));
