@@ -18,11 +18,13 @@ struct CPUCore {
 extern std::vector<CPUCore> cpu_cores;
 bool DetectCPUCores();
 
-static void set_affinity(uint32_t thread_id) {
-  int my_cpu_id = cpu_cores[thread_id % cpu_cores.size()][thread_id / cpu_cores.size()];
-  cpu_set_t my_set;
-  CPU_ZERO(&my_set);
-  CPU_SET(my_cpu_id, &my_set);
-  sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
-  printf("Pinned thread %d to CPU %d\n", thread_id, my_cpu_id);
+static void set_affinity(uint32_t thread_id, bool disable) {
+  if(!disable) {
+    int my_cpu_id = cpu_cores[thread_id % cpu_cores.size()][thread_id / cpu_cores.size()];
+    cpu_set_t my_set;
+    CPU_ZERO(&my_set);
+    CPU_SET(my_cpu_id, &my_set);
+    sched_setaffinity(0, sizeof(cpu_set_t), &my_set);
+    //printf("Pinned thread %d to CPU %d\n", thread_id, my_cpu_id);
+  }
 }

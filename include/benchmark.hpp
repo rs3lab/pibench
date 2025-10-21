@@ -106,6 +106,9 @@ struct options_t
     /// Whether to do bulk loading.
     bool bulk_load = false;
 
+    /// Disable Thread pininng
+    bool disable_pinning = false;
+
     /// Whether to skip the load phase.
     bool skip_load = false;
 

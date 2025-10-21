@@ -196,7 +196,7 @@ void benchmark_t::load() noexcept
         #pragma omp parallel num_threads(opt_.num_threads)
         {
             int thread_num = omp_get_thread_num();
-            set_affinity(thread_num);
+            set_affinity(thread_num, opt_.disable_pinning);
             tree_->tls_setup();
             
             tree_->thread_start(thread_num);
@@ -250,7 +250,7 @@ void benchmark_t::load() noexcept
         #pragma omp parallel num_threads(opt_.num_threads)
         {
             int thread_num = omp_get_thread_num();
-            set_affinity(thread_num);
+            set_affinity(thread_num, opt_.disable_pinning);
             tree_->tls_setup();
             tree_->thread_start(thread_num);
             // Initialize insert id for each thread
@@ -431,7 +431,7 @@ void benchmark_t::run() noexcept
                 /*if(opt_.num_delegation_threads > 0) {
                     tid += (tid / (opt_.num_threads_per_socket - 1)) + 1;
                 }*/
-                set_affinity(tid);
+                set_affinity(tid, opt_.disable_pinning);
 
 		//printf("omp1 threadnum: %d tid: %d cpuid: %d\n", omp_get_thread_num(), tid, sched_getcpu());
 
@@ -846,7 +846,8 @@ std::ostream& operator<<(std::ostream& os, const PiBench::options_t& opt)
        << "\t\tInsert: " << opt.insert_ratio << "\n"
        << "\t\tUpdate: " << opt.update_ratio << "\n"
        << "\t\tDelete: " << opt.remove_ratio << "\n"
-       << "\t\tScan: " << opt.scan_ratio;
+       << "\t\tScan: " << opt.scan_ratio << "\n"
+       << "\tPinning: " << !opt.disable_pinning;
     return os;
 }
 } // namespace std
